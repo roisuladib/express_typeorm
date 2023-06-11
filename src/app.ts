@@ -1,18 +1,19 @@
 import dotenv from 'dotenv';
 dotenv.config();
-import express, { NextFunction, Request, Response } from 'express';
+import express, { Request, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import cors from 'cors';
 import helmet from 'helmet';
 import {
-   validateEnv,
    AppDataSource,
-   redisClient,
    AppError,
    getConfig,
+   redisClient,
+   validateEnv,
 } from './utils';
 import { authRouter, userRouter } from './routes';
+import { Res } from './types';
 
 AppDataSource.initialize()
    .then(async () => {
@@ -69,32 +70,30 @@ AppDataSource.initialize()
       app.use('/api/v1/users', userRouter);
 
       // HEALTH CHECKER
-      app.get('/api/v1/health', async (_, res: Response) => {
+      app.get('/api/v1/health', async (_, res: Res) => {
          const message = await redisClient.get('try');
 
-         res.status(200).json({
+         res.json({
             status: 'success',
             message,
          });
       });
 
       // UNHANDLED ROUTE
-      app.all('*', (req: Request, res: Response, next: NextFunction) => {
+      app.all('*', (req: Request, res: Res, next: NextFunction) => {
          next(new AppError(404, `Route ${req.originalUrl} not found`));
       });
 
       // GLOBAL ERROR HANDLER
-      app.use(
-         (error: AppError, req: Request, res: Response, next: NextFunction) => {
-            error.status = error.status || 'error';
-            error.statusCode = error.statusCode || 500;
+      app.use((error: AppError, req: Request, res: Res, next: NextFunction) => {
+         error.status = error.status || 'error';
+         error.statusCode = error.statusCode || 500;
 
-            res.status(error.statusCode).json({
-               status: error.status,
-               message: error.message,
-            });
-         }
-      );
+         res.status(error.statusCode).json({
+            status: error.status,
+            message: error.message,
+         });
+      });
 
       const port = getConfig<number>('port');
       app.listen(port);

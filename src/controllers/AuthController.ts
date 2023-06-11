@@ -1,8 +1,9 @@
-import { CookieOptions, NextFunction, Request, Response } from 'express';
+import { CookieOptions, NextFunction, Request } from 'express';
 import { RegisterSchema, LoginSchema } from '../schemas';
 import { UserService } from '../services';
 import { AppError, getConfig, redisClient, signJwt, verifyJwt } from '../utils';
 import { User } from '../entities';
+import { Res } from '../types';
 
 export class AuthController {
    private static readonly cookiesOptions: CookieOptions = {
@@ -31,7 +32,7 @@ export class AuthController {
 
    public static async register(
       req: Request<{}, {}, RegisterSchema>,
-      res: Response,
+      res: Res,
       next: NextFunction
    ) {
       try {
@@ -67,7 +68,7 @@ export class AuthController {
 
    public static async login(
       req: Request<{}, {}, LoginSchema>,
-      res: Response,
+      res: Res,
       next: NextFunction
    ) {
       try {
@@ -119,7 +120,7 @@ export class AuthController {
 
    public static async refreshToken(
       req: Request<{}, {}, { refresh_token: string }>,
-      res: Response,
+      res: Res,
       next: NextFunction
    ) {
       try {
@@ -185,7 +186,7 @@ export class AuthController {
       }
    }
 
-   public static async logout(req: Request, res: Response, next: NextFunction) {
+   public static async logout(req: Request, res: Res, next: NextFunction) {
       try {
          const user = res.locals.user;
 
@@ -195,9 +196,7 @@ export class AuthController {
          res.cookie('refresh_token', '', { maxAge: 1 });
          res.cookie('logged_in', '', { maxAge: 1 });
 
-         res.json({
-            status: 'success',
-         });
+         res.json({ status: 'success' });
       } catch (err: any) {
          next(err);
       }

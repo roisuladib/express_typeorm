@@ -1,5 +1,7 @@
+import { Status } from '../types';
+
 export class AppError extends Error {
-   status: string;
+   status: Status;
    isOperational: boolean;
    constructor(public statusCode: number = 500, public message: string) {
       super(message);
