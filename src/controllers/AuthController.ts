@@ -76,7 +76,7 @@ export class AuthController {
 
          const isMatched = await User.comparePasswords(
             password,
-            user?.password!
+            user?.password ?? ''
          );
 
          //1. Check if user exists and password is valid

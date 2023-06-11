@@ -38,7 +38,7 @@ export class UserService {
     * @param query - The query object.
     * @returns The found user or null if not found.
     */
-   public static async find(query: Object): Promise<User | null> {
+   public static async find(query: object): Promise<User | null> {
       return this.userRepository.findOneBy(query);
    }
 

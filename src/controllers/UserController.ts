@@ -12,7 +12,11 @@ export class UserController {
     * @param next - The next middleware function.
     * @returns A promise that resolves to an array of users and the total count.
     */
-   public static async all(req: Request, res: Response, next: NextFunction) {
+   public static async all(
+      req: Request<{}, {}, {}, { page: number; limit: number }>,
+      res: Response,
+      next: NextFunction
+   ) {
       const page = req.query.page ? parseInt(req.query.page.toString()) : 1;
       const limit = req.query.limit ? parseInt(req.query.limit.toString()) : 10;
 
@@ -90,7 +94,7 @@ export class UserController {
    public static async remove(req: Request, res: Response, next: NextFunction) {
       const id = req.params.id;
 
-      let userToRemove = await this.userRepository.findOneBy({ id });
+      const userToRemove = await this.userRepository.findOneBy({ id });
 
       if (!userToRemove) {
          return 'this user not exist';
