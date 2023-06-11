@@ -3,4 +3,5 @@ export default {
    accessTokenExpiresIn: 15,
    refreshTokenExpiresIn: 60,
    redisCacheExpiresIn: 60,
+   emailFrom: 'adib17r@gmail.com',
 };

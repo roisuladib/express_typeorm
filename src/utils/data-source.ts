@@ -1,9 +1,8 @@
-require('dotenv').config();
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import config from 'config';
+import { getConfig } from './config';
 
-const postgresConfig = config.get<{
+const postgresConfig = getConfig<{
    host: string;
    port: number;
    username: string;
