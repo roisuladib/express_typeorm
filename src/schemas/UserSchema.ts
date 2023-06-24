@@ -28,6 +28,12 @@ export const registerSchema = object({
    }),
 });
 
+export const verifyEmailSchema = object({
+   params: object({
+      verificationCode: string(),
+   }),
+});
+
 export const loginSchema = object({
    body: object({
       email: string({
@@ -35,7 +41,7 @@ export const loginSchema = object({
       }).email('Invalid email address'),
       password: string({
          required_error: 'Password is required',
-      }).min(8, 'Invalid email or password'),
+      }).min(8, 'Invalid password'),
    }),
 });
 
@@ -45,3 +51,5 @@ export type RegisterSchema = Omit<
 >;
 
 export type LoginSchema = TypeOf<typeof loginSchema>['body'];
+
+export type VerifyEmailSchema = TypeOf<typeof verifyEmailSchema>['params'];

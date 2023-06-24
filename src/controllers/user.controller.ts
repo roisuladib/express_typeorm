@@ -1,7 +1,10 @@
-import { AppDataSource, paginateResponse } from '../utils';
 import { NextFunction, Request, Response } from 'express';
+import {
+   AppDataSource,
+   extractPageLimitParams,
+   paginateResponse,
+} from '../utils';
 import { User } from '../entities';
-import { Like } from 'typeorm';
 
 export class UserController {
    private static readonly userRepository = AppDataSource.getRepository(User);
@@ -19,7 +22,6 @@ export class UserController {
          {},
          {},
          {
-            name: string;
             page: number;
             limit: number;
          }
@@ -27,20 +29,14 @@ export class UserController {
       res: Response,
       next: NextFunction
    ) {
-      const name = req.query.name || '';
-      const page = req.query.page ? parseInt(req.query.page.toString()) : 1;
-      const limit = req.query.limit ? parseInt(req.query.limit.toString()) : 10;
-      const skip = (page - 1) * limit;
+      const { page, limit, skip } = extractPageLimitParams(req);
 
       const data = await UserController.userRepository.findAndCount({
-         where: {
-            name: Like('%' + name + '%'),
-         },
          skip,
          take: limit,
       });
 
-      res.json(paginateResponse(data, page, limit));
+      paginateResponse(res, data, page, limit);
    }
 
    /**
@@ -72,10 +68,7 @@ export class UserController {
    public static async me(req: Request, res: Response, next: NextFunction) {
       try {
          const user = res.locals.user;
-         res.json({
-            status: 'success',
-            data: { user },
-         });
+         res.json(user);
       } catch (err: any) {
          next(err);
       }

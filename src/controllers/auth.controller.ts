@@ -1,7 +1,15 @@
 import { CookieOptions, NextFunction, Request } from 'express';
-import { RegisterSchema, LoginSchema } from '../schemas';
+import crypto from 'crypto';
+import { RegisterSchema, LoginSchema, VerifyEmailSchema } from '../schemas';
 import { UserService } from '../services';
-import { AppError, getConfig, redisClient, signJwt, verifyJwt } from '../utils';
+import {
+   AppError,
+   Email,
+   getConfig,
+   redisClient,
+   signJwt,
+   verifyJwt,
+} from '../utils';
 import { User } from '../entities';
 import { Res } from '../types';
 
@@ -45,16 +53,33 @@ export class AuthController {
             });
          }
 
-         const user = await UserService.create({
+         const newUser = await UserService.create({
             name,
             email: email.toLowerCase(),
             password,
          });
 
-         return res.status(201).json({
-            status: 'success',
-            data: { user },
-         });
+         const { verificationCode, hashedVerificationCode } =
+            User.createVerificationCode();
+         newUser.verificationCode = hashedVerificationCode;
+         await newUser.save();
+
+         const redirectUrl = `${getConfig<string>(
+            'origin'
+         )}/verifyemail/${verificationCode}`;
+
+         try {
+            await new Email(newUser, redirectUrl).sendVerificationCode();
+            res.sendStatus(201);
+         } catch (error) {
+            newUser.verificationCode = null;
+            await newUser.save();
+
+            return res.status(500).json({
+               status: 'error',
+               message: 'There was an error sending email, please try again',
+            });
+         }
       } catch (err: any) {
          if (err.code === '23505') {
             return res.status(409).json({
@@ -62,6 +87,33 @@ export class AuthController {
                message: 'User with that email already exist',
             });
          }
+         next(err);
+      }
+   }
+
+   public static async verifyEmail(
+      req: Request<VerifyEmailSchema>,
+      res: Res,
+      next: NextFunction
+   ) {
+      try {
+         const verificationCode = crypto
+            .createHash('sha256')
+            .update(req.params.verificationCode)
+            .digest('hex');
+
+         const user = await UserService.find({ verificationCode });
+
+         if (!user) {
+            return next(new AppError(401, 'Could not verify email'));
+         }
+
+         user.verified = true;
+         user.verificationCode = null;
+         await user.save();
+
+         res.sendStatus(200);
+      } catch (err: any) {
          next(err);
       }
    }
@@ -87,6 +139,11 @@ export class AuthController {
             );
          }
 
+         // 2. Check if the user is verified
+         if (!user.verified) {
+            return next(new AppError(400, 'You are not verified'));
+         }
+
          // 2. Sign Access and Refresh Tokens
          const { access_token, refresh_token } = await UserService.signTokens(
             user
@@ -109,7 +166,7 @@ export class AuthController {
          });
 
          // 4. Send response
-         res.json({ status: 'success' });
+         res.sendStatus(200);
       } catch (err: any) {
          next(err);
       }
@@ -173,7 +230,7 @@ export class AuthController {
             httpOnly: false,
          });
 
-         res.json({ status: 'success' });
+         res.sendStatus(200);
       } catch (err: any) {
          next(err);
       }
@@ -189,7 +246,7 @@ export class AuthController {
          res.cookie('refresh_token', '', { maxAge: 1 });
          res.cookie('logged_in', '', { maxAge: 1 });
 
-         res.json({ status: 'success' });
+         res.sendStatus(200);
       } catch (err: any) {
          next(err);
       }

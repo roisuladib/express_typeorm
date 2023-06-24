@@ -23,6 +23,8 @@ AppDataSource.initialize()
       const app = express();
 
       // TEMPLATE ENGINE
+      app.set('view engine', 'pug');
+      app.set('views', `${__dirname}/views`);
 
       // MIDDLEWARE
 
@@ -39,7 +41,7 @@ AppDataSource.initialize()
       app.use(
          cors({
             origin: [getConfig<string>('origin'), 'http://localhost:5173'],
-            methods: 'GET,HEAD,PUT,PATCH,POST',
+            methods: 'GET,POST,PUT',
             allowedHeaders: 'Content-Type,Authorization',
             exposedHeaders: 'Content-Length,ETag',
             credentials: true,
@@ -59,7 +61,7 @@ AppDataSource.initialize()
             },
             hsts: {
                maxAge: 31536000, // 1 year in seconds
-               includeSubDomains: true,
+               includeSubDomains: false,
                preload: true,
             },
          })
