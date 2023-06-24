@@ -1,2 +1,1 @@
-export * from './Model';
-export * from './User';
+export * from './user.entity';

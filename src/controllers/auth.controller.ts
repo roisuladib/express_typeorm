@@ -96,35 +96,32 @@ export class AuthController {
          res.cookie(
             'access_token',
             access_token,
-            this.accessTokenCookieOptions
+            AuthController.accessTokenCookieOptions
          );
          res.cookie(
             'refresh_token',
             refresh_token,
-            this.refreshTokenCookieOptions
+            AuthController.refreshTokenCookieOptions
          );
          res.cookie('logged_in', true, {
-            ...this.accessTokenCookieOptions,
+            ...AuthController.accessTokenCookieOptions,
             httpOnly: false,
          });
 
          // 4. Send response
-         res.json({
-            status: 'success',
-            access_token,
-         });
+         res.json({ status: 'success' });
       } catch (err: any) {
          next(err);
       }
    }
 
    public static async refreshToken(
-      req: Request<{}, {}, { refresh_token: string }>,
+      req: Request,
       res: Res,
       next: NextFunction
    ) {
       try {
-         const { refresh_token } = req.body;
+         const { refresh_token } = req.cookies as { refresh_token: string };
 
          const message = 'Could not refresh access token';
 
@@ -169,18 +166,14 @@ export class AuthController {
          res.cookie(
             'access_token',
             access_token,
-            this.accessTokenCookieOptions
+            AuthController.accessTokenCookieOptions
          );
          res.cookie('logged_in', true, {
-            ...this.accessTokenCookieOptions,
+            ...AuthController.accessTokenCookieOptions,
             httpOnly: false,
          });
 
-         // 5. Send response
-         res.json({
-            status: 'success',
-            access_token,
-         });
+         res.json({ status: 'success' });
       } catch (err: any) {
          next(err);
       }

@@ -1,14 +1,14 @@
 import { Entity, Column, Index, BeforeInsert } from 'typeorm';
 import bcrypt from 'bcryptjs';
-import Model from './Model';
+import BaseEntity from './base.entity';
 
-export enum RoleEnumType {
-   ADMIN = 'admin',
+export enum RoleUser {
    USER = 'user',
+   ADMIN = 'admin',
 }
 
 @Entity('users')
-export class User extends Model {
+export class User extends BaseEntity {
    @Column()
    name: string;
 
@@ -23,10 +23,10 @@ export class User extends Model {
 
    @Column({
       type: 'enum',
-      enum: RoleEnumType,
-      default: RoleEnumType.USER,
+      enum: RoleUser,
+      default: RoleUser.USER,
    })
-   role: RoleEnumType.USER;
+   role: RoleUser.USER;
 
    @Column({
       default: 'default.png',

@@ -1,6 +1,7 @@
-import { AppDataSource } from '../utils';
+import { AppDataSource, paginateResponse } from '../utils';
 import { NextFunction, Request, Response } from 'express';
 import { User } from '../entities';
+import { Like } from 'typeorm';
 
 export class UserController {
    private static readonly userRepository = AppDataSource.getRepository(User);
@@ -13,18 +14,33 @@ export class UserController {
     * @returns A promise that resolves to an array of users and the total count.
     */
    public static async all(
-      req: Request<{}, {}, {}, { page: number; limit: number }>,
+      req: Request<
+         {},
+         {},
+         {},
+         {
+            name: string;
+            page: number;
+            limit: number;
+         }
+      >,
       res: Response,
       next: NextFunction
    ) {
+      const name = req.query.name || '';
       const page = req.query.page ? parseInt(req.query.page.toString()) : 1;
       const limit = req.query.limit ? parseInt(req.query.limit.toString()) : 10;
-
       const skip = (page - 1) * limit;
-      return this.userRepository.findAndCount({
-         skip: skip,
+
+      const data = await UserController.userRepository.findAndCount({
+         where: {
+            name: Like('%' + name + '%'),
+         },
+         skip,
          take: limit,
       });
+
+      res.json(paginateResponse(data, page, limit));
    }
 
    /**
@@ -37,7 +53,7 @@ export class UserController {
    public static async one(req: Request, res: Response, next: NextFunction) {
       const id = req.params.id;
 
-      const user = await this.userRepository.findOne({
+      const user = await UserController.userRepository.findOne({
          where: { id },
       });
 
@@ -81,7 +97,7 @@ export class UserController {
          age,
       });
 
-      return this.userRepository.save(user);
+      return UserController.userRepository.save(user);
    }
 
    /**
@@ -94,13 +110,15 @@ export class UserController {
    public static async remove(req: Request, res: Response, next: NextFunction) {
       const id = req.params.id;
 
-      const userToRemove = await this.userRepository.findOneBy({ id });
+      const userToRemove = await UserController.userRepository.findOneBy({
+         id,
+      });
 
       if (!userToRemove) {
          return 'this user not exist';
       }
 
-      await this.userRepository.remove(userToRemove);
+      await UserController.userRepository.remove(userToRemove);
 
       return 'user has been removed';
    }

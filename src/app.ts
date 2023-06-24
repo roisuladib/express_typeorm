@@ -38,8 +38,8 @@ AppDataSource.initialize()
       // 4. Cors
       app.use(
          cors({
-            origin: getConfig<string>('origin'),
-            methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+            origin: [getConfig<string>('origin'), 'http://localhost:5173'],
+            methods: 'GET,HEAD,PUT,PATCH,POST',
             allowedHeaders: 'Content-Type,Authorization',
             exposedHeaders: 'Content-Length,ETag',
             credentials: true,
@@ -89,6 +89,8 @@ AppDataSource.initialize()
          error.status = error.status || 'error';
          error.statusCode = error.statusCode || 500;
 
+         console.log('error', error);
+
          res.status(error.statusCode).json({
             status: error.status,
             message: error.message,
@@ -100,4 +102,4 @@ AppDataSource.initialize()
 
       console.log(`Server started on port: ${port}`);
    })
-   .catch(error => console.log(error));
+   .catch(error => console.error(error));
