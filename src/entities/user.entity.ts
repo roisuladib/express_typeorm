@@ -1,14 +1,15 @@
 import { Entity, Column, Index, BeforeInsert } from 'typeorm';
 import bcrypt from 'bcryptjs';
-import Model from './Model';
+import crypto from 'crypto';
+import BaseEntity from './base.entity';
 
-export enum RoleEnumType {
-   ADMIN = 'admin',
+export enum RoleUser {
    USER = 'user',
+   ADMIN = 'admin',
 }
 
 @Entity('users')
-export class User extends Model {
+export class User extends BaseEntity {
    @Column()
    name: string;
 
@@ -23,10 +24,10 @@ export class User extends Model {
 
    @Column({
       type: 'enum',
-      enum: RoleEnumType,
-      default: RoleEnumType.USER,
+      enum: RoleUser,
+      default: RoleUser.USER,
    })
-   role: RoleEnumType.USER;
+   role: RoleUser.USER;
 
    @Column({
       default: 'default.png',
@@ -37,6 +38,13 @@ export class User extends Model {
       default: false,
    })
    verified: boolean;
+
+   @Index('verificationCode_index')
+   @Column({
+      type: 'text',
+      nullable: true,
+   })
+   verificationCode!: string | null;
 
    @BeforeInsert()
    async hashPassword() {
@@ -51,7 +59,17 @@ export class User extends Model {
       return await bcrypt.compare(candidatePassword, hashedPassword);
    }
 
+   static createVerificationCode() {
+      const verificationCode = crypto.randomBytes(32).toString('hex');
+      const hashedVerificationCode = crypto
+         .createHash('sha256')
+         .update(verificationCode)
+         .digest('hex');
+
+      return { verificationCode, hashedVerificationCode };
+   }
+
    toJSON() {
-      return { ...this, password: undefined, verified: undefined };
+      return { ...this, password: undefined, verificationCode: undefined };
    }
 }

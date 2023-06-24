@@ -8,7 +8,7 @@ export const deserializeUser = async (
    next: NextFunction
 ) => {
    try {
-      let access_token;
+      let access_token = '';
 
       if (
          req.headers.authorization &&

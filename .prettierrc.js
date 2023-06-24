@@ -7,4 +7,12 @@ module.exports = {
    quoteProps: 'consistent',
    proseWrap: 'always',
    singleAttributePerLine: true,
+   overrides: [
+      {
+         files: './src/migrations/**',
+         options: {
+            printWidth: null,
+         },
+      },
+   ],
 };
