@@ -2,6 +2,19 @@ POST http://localhost:8000/api/v1/auth/login
 Content-Type: application/json
 
 {
-	"email": "adib17r@gmail.com",
+	"email": "hasan@gmail.com",
 	"password": "17Kokomo#"
+}
+
+###
+GET http://localhost:8000/api/v1/auth/refresh
+
+###
+POST http://localhost:8000/api/v1/posts
+Content-Type: application/json
+
+{
+	"title": "Title post 3",
+	"content": "Ini content 3",
+	"image": "default-post-3.jpg"
 }

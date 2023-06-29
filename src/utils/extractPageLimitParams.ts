@@ -1,24 +1,14 @@
-import { Request } from 'express';
+import { PageLimit, TypedRequestQuery } from '../types';
 
 /**
  * Helper function to extract and validate request parameters.
  * @param req - The Express request object.
  * @returns An object containing the validated parameters.
  */
-export function extractPageLimitParams(
-   req: Request<
-      {},
-      {},
-      {},
-      {
-         page: number;
-         limit: number;
-      }
-   >
-) {
+export function extractPageLimitParams(req: TypedRequestQuery<PageLimit>) {
    const params = {
-      page: req.query.page ? parseInt(String(req.query.page), 10) : 1,
-      limit: req.query.limit ? parseInt(String(req.query.limit), 10) : 10,
+      page: req.query.page ? parseInt(req.query.page, 10) : 1,
+      limit: req.query.limit ? parseInt(req.query.limit, 10) : 10,
       skip: 0, // Default value for skip
    };
 

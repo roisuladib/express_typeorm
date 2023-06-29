@@ -22,7 +22,7 @@ export const signJwt = <T extends string | Buffer | object>(
 
    const encoded = jwt.sign(payload, privateKey, {
       ...(options && options),
-      issuer: 'Kang Adib',
+      issuer: 'Anonymous',
       algorithm: 'RS256',
    });
 
