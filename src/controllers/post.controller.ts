@@ -96,8 +96,28 @@ export class PostController {
          if (!post) {
             return;
          }
-         post.remove();
+         await post.remove();
          res.sendStatus(200);
+      } catch (err: any) {
+         next(err);
+      }
+   }
+
+   public static async parseFormData(
+      req: TypedRequestBody<{ data: any; image: string }>,
+      res: Res,
+      next: NextFunction
+   ) {
+      try {
+         if (!req.body.data) return next();
+
+         const parsedBody = { ...JSON.parse(req.body.data) };
+         if (req.body.image) {
+            parsedBody['image'] = req.body.image;
+         }
+
+         req.body = parsedBody;
+         next();
       } catch (err: any) {
          next(err);
       }
