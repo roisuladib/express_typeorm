@@ -28,6 +28,7 @@ export class Email {
 
       return nodemailer.createTransport({
          ...smtp,
+         service: 'gmail',
          auth: {
             user: smtp.user,
             pass: smtp.pass,

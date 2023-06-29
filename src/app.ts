@@ -12,7 +12,7 @@ import {
    redisClient,
    validateEnv,
 } from './utils';
-import { authRouter, userRouter } from './routes';
+import { authRouter, postRouter, userRouter } from './routes';
 import { Res } from './types';
 
 AppDataSource.initialize()
@@ -41,7 +41,7 @@ AppDataSource.initialize()
       app.use(
          cors({
             origin: [getConfig<string>('origin'), 'http://localhost:5173'],
-            methods: 'GET,POST,PUT',
+            methods: 'GET,POST,PATCH,DELETE',
             allowedHeaders: 'Content-Type,Authorization',
             exposedHeaders: 'Content-Length,ETag',
             credentials: true,
@@ -70,6 +70,7 @@ AppDataSource.initialize()
       // ROUTES
       app.use('/api/v1/auth', authRouter);
       app.use('/api/v1/users', userRouter);
+      app.use('/api/v1/posts', postRouter);
 
       // HEALTH CHECKER
       app.get('/api/v1/health', async (_, res: Res) => {

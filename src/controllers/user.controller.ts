@@ -5,6 +5,7 @@ import {
    paginateResponse,
 } from '../utils';
 import { User } from '../entities';
+import { Pagination, TypedRequestQuery } from '../types';
 
 export class UserController {
    private static readonly userRepository = AppDataSource.getRepository(User);
@@ -17,15 +18,7 @@ export class UserController {
     * @returns A promise that resolves to an array of users and the total count.
     */
    public static async all(
-      req: Request<
-         {},
-         {},
-         {},
-         {
-            page: number;
-            limit: number;
-         }
-      >,
+      req: TypedRequestQuery<Pagination>,
       res: Response,
       next: NextFunction
    ) {

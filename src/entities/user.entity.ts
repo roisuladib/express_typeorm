@@ -1,7 +1,8 @@
-import { Entity, Column, Index, BeforeInsert } from 'typeorm';
+import { Entity, Column, Index, BeforeInsert, OneToMany } from 'typeorm';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import BaseEntity from './base.entity';
+import { Post } from './post.entity';
 
 export enum RoleUser {
    USER = 'user',
@@ -45,6 +46,9 @@ export class User extends BaseEntity {
       nullable: true,
    })
    verificationCode!: string | null;
+
+   @OneToMany(() => Post, post => post.user)
+   posts: Post[];
 
    @BeforeInsert()
    async hashPassword() {

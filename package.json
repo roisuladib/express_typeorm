@@ -8,7 +8,7 @@
       "start": "ts-node-dev --respawn --transpile-only --exit-child src/app.ts",
       "build": "rm -rf build && node scripts/build.mjs",
       "typeorm": "typeorm-ts-node-commonjs",
-      "migrate": "yarn typeorm migration:generate ./src/migrations/add-verificationCode-field -d ./src/utils/data-source.ts",
+      "migrate": "yarn typeorm migration:generate ./src/migrations/create-posts-table -d ./src/utils/data-source.ts",
       "db:push": "yarn typeorm migration:run -d src/utils/data-source.ts",
       "lint": "eslint src/** --ext .ts",
       "precommit": "lint-staged"
