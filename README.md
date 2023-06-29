@@ -1,9 +1,9 @@
 # API with Node.js + PostgreSQL + Redis + TypeORM: JWT Authentication
 
-This article will teach you how to implement JSON Web Token (JWT) Authentication
-with Node.js, PostgreSQL, TypeORM, ExpressJs, Redis, Docker, and Docker-compose.
-We will implement the assymetric (RS256 algorithm) JSON Web Token authentication
-manually without using any Node.js authentication library like PassportJs.
+This implement JSON Web Token (JWT) Authentication with Node.js, PostgreSQL,
+TypeORM, ExpressJs, Redis, Docker, and Docker-compose. We will implement the
+assymetric (RS256 algorithm) JSON Web Token authentication manually without
+using any Node.js authentication library like PassportJs.
 
 ![API with Node.js + PostgreSQL + TypeORM: JWT Authentication](https://res.cloudinary.com/dyxgn1seq/image/upload/v1686494333/github/express_typeorm_ljnc1s.webp)
 
